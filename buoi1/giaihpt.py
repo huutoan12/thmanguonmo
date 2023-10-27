@@ -1,91 +1,89 @@
 import tkinter as tk
-import sympy as sp
+import numpy as np
 
 def solve_equations():
-    # Lấy giá trị từ các trường đầu vào
+    # Lấy dữ liệu đầu vào từ các trường nhập liệu
     coefficients = []
     constants = []
-
     for i in range(num_equations):
-        equation_coeffs = []
+        coeff_row = []
         for j in range(num_variables):
-            equation_coeffs.append(float(entry_coeffs[i][j].get()))
-        coefficients.append(equation_coeffs)
-        constants.append(float(entry_constants[i].get()))
+            coeff_row.append(float(entry_vars[i][j].get()))
+        coefficients.append(coeff_row)
+        constants.append(float(entry_consts[i].get()))
 
-    # Tạo các biến và phương trình
-    variables = sp.symbols('x0:%d' % num_variables)
-    eqns = []
-    for i in range(num_equations):
-        eqn = sp.Eq(0, constants[i])
-        for j in range(num_variables):
-            eqn = eqn + variables[j] * coefficients[i][j]
-        eqns.append(eqn)
+    # Tạo ma trận hệ số và vectơ hằng số từ dữ liệu đầu vào
+    A = np.array(coefficients)
+    b = np.array(constants)
 
-    # Giải phương trình tuyến tính
-    solution = sp.solve(eqns, variables)
-
-    # Hiển thị kết quả trong vùng hiển thị
-    result_label.configure(text="Kết quả:")
-    for i, var in enumerate(variables):
-        result_label.configure(text=result_label.cget("text") + f" {var} = {solution[var]:.2f}")
-
-def update_entries():
-    global num_equations, num_variables, entry_coeffs, entry_constants
-
-    num_equations = int(num_equations_entry.get())
-    num_variables = int(num_variables_entry.get())
-
-    # Xóa các trường đầu vào hiện tại (nếu có)
-    for i in range(len(entry_coeffs)):
-        for j in range(num_variables):
-            entry_coeffs[i][j].destroy()
-        entry_constants[i].destroy()
-
-    # Tạo các trường đầu vào mới
-    entry_coeffs = []
-    entry_constants = []
-    for i in range(num_equations):
-        equation_coeffs = []
-        for j in range(num_variables):
-            entry = tk.Entry(window)
-            entry.grid(row=i+2, column=j+1)
-            equation_coeffs.append(entry)
-        entry_coeffs.append(equation_coeffs)
-
-        entry = tk.Entry(window)
-        entry.grid(row=i+2, column=num_variables+2)
-        entry_constants.append(entry)
+    # Giải quyết hệ phương trình
+    try:
+        x = np.linalg.solve(A, b)
+        result_label.config(text="Các giá trị của các ẩn:\n{}".format(x))
+    except np.linalg.LinAlgError:
+        result_label.config(text="Hệ phương trình không có nghiệm.")
 
 # Tạo cửa sổ giao diện
 window = tk.Tk()
+window.title("Giải hệ phương trình tuyến tính")
+window.geometry("400x300")
 
-# Tạo trường nhập số phương trình và số ẩn
-num_equations_label = tk.Label(window, text="Số phương trình:")
-num_equations_label.grid(row=0, column=0)
-num_equations_entry = tk.Entry(window)
-num_equations_entry.grid(row=0, column=1)
+# Tạo các nhãn và trường nhập liệu cho số phương trình và số ẩn
+label_num_equations = tk.Label(window, text="Số phương trình:")
+label_num_equations.pack()
 
-num_variables_label = tk.Label(window, text="Số ẩn:")
-num_variables_label.grid(row=0, column=2)
-num_variables_entry = tk.Entry(window)
-num_variables_entry.grid(row=0, column=3)
+entry_num_equations = tk.Entry(window)
+entry_num_equations.pack()
 
-update_button = tk.Button(window, text="Cập nhật", command=update_entries)
-update_button.grid(row=0, column=4)
+label_num_variables = tk.Label(window, text="Số ẩn:")
+label_num_variables.pack()
 
-# Tạo các trường đầu vào và nút giải
-entry_coeffs = []
-entry_constants = []
-num_equations = 0
-num_variables = 0
+entry_num_variables = tk.Entry(window)
+entry_num_variables.pack()
 
-solve_button = tk.Button(window, text="Giải", command=solve_equations)
-solve_button.grid(row=1, columnspan=6)
+def create_input_fields():
+    global num_equations, num_variables, entry_vars, entry_consts, solve_button, result_label
 
-# Tạo vùng hiển thị kết quả
-result_label = tk.Label(window, text="")
-result_label.grid(row=2, columnspan=6)
+    # Lấy số phương trình và số ẩn từ trường nhập liệu
+    num_equations = int(entry_num_equations.get())
+    num_variables = int(entry_num_variables.get())
 
-# Chạy vòng lặp chính của ứng dụng
+    # Xóa các trường nhập liệu và nút giải phương trình cũ (nếu có)
+    if 'entry_vars' in globals():
+        for i in range(num_equations):
+            for j in range(num_variables):
+                entry_vars[i][j].destroy()
+        for i in range(num_equations):
+            entry_consts[i].destroy()
+        solve_button.destroy()
+        result_label.destroy()
+
+    # Tạo lại các trường nhập liệu và nút giải phương trình mới
+    entry_vars = []
+    entry_consts = []
+    for i in range(num_equations):
+        label_eq = tk.Label(window, text="Phương trình {}: ".format(i+1))
+        label_eq.pack()
+        entry_vars_row = []
+        for j in range(num_variables):
+            entry_var = tk.Entry(window)
+            entry_var.pack()
+            entry_vars_row.append(entry_var)
+        entry_vars.append(entry_vars_row)
+        label_const = tk.Label(window, text="Hằng số:")
+        label_const.pack()
+        entry_const = tk.Entry(window)
+        entry_const.pack()
+        entry_consts.append(entry_const)
+
+    solve_button = tk.Button(window, text="Giải phương trình", command=solve_equations)
+    solve_button.pack()
+
+    result_label = tk.Label(window, text="")
+    result_label.pack()
+# Tạo nút tạo các trường nhập liệu và nút giải phương trình
+create_fields_button = tk.Button(window, text="Tạo trường nhập liệu", command=create_input_fields)
+create_fields_button.pack()
+
+# Chạy giao diện
 window.mainloop()
