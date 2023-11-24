@@ -26,7 +26,7 @@ def solve_equations():
 # Tạo cửa sổ giao diện
 window = tk.Tk()
 window.title("Giải hệ phương trình tuyến tính")
-window.geometry("400x300")
+window.geometry("800x800")
 
 # Tạo các nhãn và trường nhập liệu cho số phương trình và số ẩn
 label_num_equations = tk.Label(window, text="Số phương trình:")
