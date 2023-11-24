@@ -22,7 +22,7 @@ def display_results(attribute):
 
         result_text.config(state=tk.NORMAL)
         result_text.delete(1.0, tk.END)
-        result_text.insert(tk.END, "Maximum Values (First 10 Rows):\n{}\n\nMinimum Values (First 10 Rows):\n{}\n\nMean Values (First 10 Rows):\n{}".format(max_values, min_values, mean_values))
+        result_text.insert(tk.END, "Giá trị max:\n{}\n\nGiá trị min:\n{}\n\nTrung bình cộng:\n{}".format(max_values, min_values, mean_values))
         result_text.config(state=tk.DISABLED)
 
         # Plotting the selected attribute for the first 10 rows
@@ -31,7 +31,7 @@ def display_results(attribute):
     except FileNotFoundError:
         result_text.config(state=tk.NORMAL)
         result_text.delete(1.0, tk.END)
-        result_text.insert(tk.END, "File not found. Please enter a valid file path.")
+        result_text.insert(tk.END, "không tìm được file đầu vào")
         result_text.config(state=tk.DISABLED)
 
 # Function to open a file dialog and update the entry widget
@@ -44,9 +44,9 @@ def browse_file():
 def plot_attribute(dataframe, attribute):
     ax.clear()  # Clear the previous plot
     ax.bar(dataframe.index, dataframe[attribute])
-    ax.set_xlabel('Index')
+    ax.set_xlabel('Giá trị')
     ax.set_ylabel(attribute)
-    ax.set_title(f'{attribute} Analysis (First 10 Rows)')
+    ax.set_title(f'{attribute} phân tích dữ liệu')
     canvas.draw()  # Redraw the canvas
 
 # Function to update the statistics and plot when the attribute changes
@@ -56,18 +56,18 @@ def update_on_attribute_change(*args):
 
 # Create the main window
 root = tk.Tk()
-root.title("Statistical Analysis and Visualization")
+root.title("Phân tích dữ liệu")
 
 # Create an entry for file path
-file_path_label = ttk.Label(root, text="Enter CSV File Path:")
+file_path_label = ttk.Label(root, text="Chọn đường dẫn:")
 file_path_label.pack()
 file_path_entry = ttk.Entry(root, width=30)
 file_path_entry.pack(side=tk.LEFT, padx=5)
-browse_button = ttk.Button(root, text="Browse", command=browse_file)
+browse_button = ttk.Button(root, text="Tải file", command=browse_file)
 browse_button.pack(side=tk.LEFT)
 
 # Create a dropdown menu for attribute selection
-attribute_label = ttk.Label(root, text="Select Attribute:")
+attribute_label = ttk.Label(root, text="Chọn thuộc tính:")
 attribute_label.pack()
 attributes = ["Hours Studied", "Previous Scores", "Extracurricular Activities", "Sleep Hours",
               "Sample Question Papers Practiced", "Performance Index"]
@@ -78,7 +78,7 @@ attribute_menu = ttk.Combobox(root, textvariable=attribute_var, values=attribute
 attribute_menu.pack()
 
 # Create a button to trigger the calculation and visualization
-calculate_button = ttk.Button(root, text="Calculate and Visualize", command=lambda: display_results(attribute_var.get()))
+calculate_button = ttk.Button(root, text="Tính toán vẽ biểu đồ", command=lambda: display_results(attribute_var.get()))
 calculate_button.pack(pady=10)
 
 # Create a text widget to display the results
